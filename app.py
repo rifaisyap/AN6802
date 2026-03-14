@@ -3,7 +3,6 @@ import joblib
 import os
 from groq import Groq
 
-
 #os.environ["GROQ_API_KEY"] = ""
 
 model = joblib.load("foodexp.pkl")
