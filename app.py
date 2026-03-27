@@ -3,89 +3,75 @@ import joblib
 import os
 from groq import Groq
 
-# Load ML model
+#os.environ["GROQ_API_KEY"] = ""
+
 model = joblib.load("foodexp.pkl")
 
-# Initialize Groq client using environment variable
-client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
-
-# Create Flask app
+client = Groq()
 app = Flask(__name__)
 
-
-@app.route("/", methods=["GET", "POST"])
+@app.route("/",methods=["get","post"])
 def index():
-    return render_template("index.html")
+    return(render_template("index.html"))
 
-
-@app.route("/main", methods=["GET", "POST"])
+@app.route("/main",methods=["get","post"])
 def main():
-    return render_template("main.html")
+    return(render_template("main.html"))
 
-
-@app.route("/ethics", methods=["GET", "POST"])
+@app.route("/ethics",methods=["get","post"])
 def ethics():
-    return render_template("ethics.html")
+    return(render_template("ethics.html"))
 
-
-@app.route("/correct", methods=["GET", "POST"])
+@app.route("/correct",methods=["get","post"])
 def correct():
-    return render_template("correct.html")
+    return(render_template("correct.html"))
 
-
-@app.route("/wrong", methods=["GET", "POST"])
+@app.route("/wrong",methods=["get","post"])
 def wrong():
-    return render_template("wrong.html")
+    return(render_template("wrong.html"))
 
-
-@app.route("/econ", methods=["GET", "POST"])
+@app.route("/econ",methods=["get","post"])
 def econ():
-    return render_template("econ.html")
+    return(render_template("econ.html"))
 
-
-@app.route("/foodExp", methods=["GET", "POST"])
+@app.route("/foodExp",methods=["get","post"])
 def foodExp():
     q = float(request.form.get("q"))
     r = model.predict([[q]])
-    return render_template("foodExp.html", r=r[0][0])
+    return(render_template("foodExp.html",r=r[0][0]))
 
-
-@app.route("/chatbot", methods=["GET", "POST"])
+@app.route("/chatbot",methods=["get","post"])
 def chatbot():
-    return render_template("chatbot.html")
+    return(render_template("chatbot.html"))
 
-
-@app.route("/roe", methods=["GET", "POST"])
+@app.route("/roe",methods=["get","post"])
 def roe():
-    response = client.chat.completions.create(
-        model="llama-3.1-8b-instant",
-        messages=[
+    r = client.chat.completions.create(
+        model = "llama-3.1-8b-instant",
+        messages = [
             {"role": "system", "content": "Please explain RoE in 20 words"}
         ]
     )
+    return(render_template("roe.html",r=r.choices[0].message.content))
 
-    return render_template("roe.html", r=response.choices[0].message.content)
-
-
-@app.route("/generalQuestion", methods=["GET", "POST"])
+@app.route("/generalQuestion",methods=["get","post"])
 def generalQuestion():
-    return render_template("generalQuestion.html")
+    return(render_template("generalQuestion.html"))
 
-
-@app.route("/groqReply", methods=["GET", "POST"])
+@app.route("/groqReply",methods=["get","post"])
 def groqReply():
     q = request.form.get("q")
-
-    response = client.chat.completions.create(
-        model="llama-3.1-8b-instant",
-        messages=[
-            {"role": "user", "content": q}
+    r = client.chat.completions.create(
+        model = "llama-3.1-8b-instant",
+        messages = [
+            {"role": "system", "content": q}
         ]
     )
+    return(render_template("groqReply.html",r=r.choices[0].message.content))
 
-    return render_template("groqReply.html", r=response.choices[0].message.content)
-
+@app.route("/equity",methods=["get","post"])
+def equity():
+    return(render_template("equity.html"))
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 10000))
-    app.run(host="0.0.0.0", port=port)
+    app.run()
